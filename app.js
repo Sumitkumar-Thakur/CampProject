@@ -5,7 +5,7 @@ import { Campground }  from './models/campground.js';
 import mongoose from "mongoose";
 import  methodOverride from "method-override";
 import dotenv from 'dotenv';
-
+import ejsMate from "ejs-mate";
 dotenv.config();
 
 mongoose.connect(process.env.MONGO_PROD_URI)
@@ -21,6 +21,7 @@ const __dirname = path.resolve();
 const app = express();
 
 app.set('view engine', 'ejs');
+app.engine('ejs', ejsMate)
 app.set('views', path.join(__dirname, 'views'));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
