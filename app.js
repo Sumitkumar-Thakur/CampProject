@@ -6,6 +6,8 @@ import mongoose from "mongoose";
 import  methodOverride from "method-override";
 import dotenv from 'dotenv';
 import ejsMate from "ejs-mate";
+import catchAsync from "./utils/catchAsync.js";
+import expressError from "./utils/expressError.js";
 dotenv.config();
 
 mongoose.connect(process.env.MONGO_PROD_URI)
@@ -31,62 +33,59 @@ app.get('/', (req, res) =>{
     res.render('home')
 })
 
-app.get('/campgrounds', async (req, res) =>{
+app.get('/campgrounds', catchAsync(async (req, res) =>{
     const campgrounds = await Campground.find({});
     res.render("./campgrounds/index", { campgrounds })
-})
+}))
 
-app.get('/campgrounds/new', async (req, res) =>{
+app.get('/campgrounds/new', (req, res) =>{
     res.render("./campgrounds/new")
 })
 
-app.post('/campgrounds', async (req, res) => {
+app.post('/campgrounds', catchAsync(async (req, res) => {
+    if(!req.body.campground) throw new expressError("Invalid Campground Data" , 400)
     const campground = new Campground(req.body.campground)
     await campground.save()
     res.redirect(`/campgrounds/${campground.id}`)
-})
+}))
 
-app.get('/campgrounds/:id', async (req, res) =>{
+app.get('/campgrounds/:id', catchAsync(async (req, res) =>{
     const id = req.params.id
-    try {
-        const campground = await Campground.findById(id);
-        res.render('./campgrounds/show', { campground });
-    } catch (error) {
-        console.error(error);
-        res.status(500).send('Internal Server Error');
-    }
-})
+    const campground = await Campground.findById(id);
+    res.render('./campgrounds/show', { campground });
+    
+}))
 
-app.get('/campgrounds/:id/edit', async(req, res) => {
+app.get('/campgrounds/:id/edit', catchAsync(async(req, res) => {
         const id = req.params.id
         const campground = await Campground.findById(id);
         res.render('./campgrounds/edits', { campground });
 
-})
+}))
 
-app.put('/campgrounds/:id', async (req, res) => {
+app.put('/campgrounds/:id', catchAsync(async (req, res) => {
     const id = req.params.id;
-    try {
-        const campground = await Campground.findByIdAndUpdate(id, { ...req.body.campground});
-        res.redirect(`/campgrounds/${campground._id}`);
-    } catch (error) {
-        console.error(error);
-        res.status(500).send('Internal Server Error');
-    }
-})
+    const campground = await Campground.findByIdAndUpdate(id, { ...req.body.campground});
+    res.redirect(`/campgrounds/${campground._id}`);
 
-app.delete('/campgrounds/:id', async (req, res) => {
+}))
+
+app.delete('/campgrounds/:id', catchAsync(async (req, res) => {
     const id = req.params.id;
-    try {
+    
         const campground = await Campground.findByIdAndRemove(id, { ...req.body.campground});
         res.redirect(`/campgrounds`);
-    } catch (error) {
-        console.error(error);
-        res.status(500).send('Internal Server Error');
-    }
+}))
+
+app.all('*', (req, res, next) => {
+    next(new expressError("Page Not Found" , 404))
 })
 
 
+app.use((err, req, res, next) => {
+    const { statusCode = 500, message = "Something Went Wrong!!"} = err;
+    res.status(statusCode).send(message);
+})
 
 app.listen(3000, () => {
     console.log('Serving on port 3000')
