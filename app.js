@@ -8,6 +8,7 @@ import dotenv from 'dotenv';
 import ejsMate from "ejs-mate";
 import catchAsync from "./utils/catchAsync.js";
 import expressError from "./utils/expressError.js";
+import Joi from "joi";
 dotenv.config();
 
 mongoose.connect(process.env.MONGO_PROD_URI)
@@ -43,7 +44,22 @@ app.get('/campgrounds/new', (req, res) =>{
 })
 
 app.post('/campgrounds', catchAsync(async (req, res) => {
-    if(!req.body.campground) throw new expressError("Invalid Campground Data" , 400)
+    // if(!req.body.campground) throw new expressError("Invalid Campground Data" , 400)
+    const campgroundScheme = Joi.object({
+        campground: Joi.object({
+            title: Joi.string().required(),
+            price: Joi.number().required().min(0),
+            image: Joi.string().required(),
+            location: Joi.string().required(),
+            description: Joi.string().required(),
+        }).required()
+    })
+    const { error } = campgroundScheme.validate(req.body);
+    
+    if(error){
+        const msg  = error.details.map( e => e.message).join(',')
+        throw new expressError(msg, 400);
+    }
     const campground = new Campground(req.body.campground)
     await campground.save()
     res.redirect(`/campgrounds/${campground.id}`)
@@ -83,8 +99,9 @@ app.all('*', (req, res, next) => {
 
 
 app.use((err, req, res, next) => {
-    const { statusCode = 500, message = "Something Went Wrong!!"} = err;
-    res.status(statusCode).send(message);
+    const { statusCode = 500} = err;
+    if(!err.message) err.message = "Oh No, Something Went Wrong";
+    res.status(statusCode).render("error", {err});
 })
 
 app.listen(3000, () => {
