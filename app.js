@@ -9,7 +9,19 @@ import ejsMate from "ejs-mate";
 import catchAsync from "./utils/catchAsync.js";
 import expressError from "./utils/expressError.js";
 import Joi from "joi";
+import { campgroundScheme } from "./schemasVerification.js";
 dotenv.config();
+
+const validateCampground = (req, res, next) => {
+    
+    const { error } = campgroundScheme.validate(req.body);
+    
+    if(error){
+        const msg  = error.details.map( e => e.message).join(',')
+        throw new expressError(msg, 400);
+    }
+    next();
+}
 
 mongoose.connect(process.env.MONGO_PROD_URI)
 
@@ -43,23 +55,8 @@ app.get('/campgrounds/new', (req, res) =>{
     res.render("./campgrounds/new")
 })
 
-app.post('/campgrounds', catchAsync(async (req, res) => {
-    // if(!req.body.campground) throw new expressError("Invalid Campground Data" , 400)
-    const campgroundScheme = Joi.object({
-        campground: Joi.object({
-            title: Joi.string().required(),
-            price: Joi.number().required().min(0),
-            image: Joi.string().required(),
-            location: Joi.string().required(),
-            description: Joi.string().required(),
-        }).required()
-    })
-    const { error } = campgroundScheme.validate(req.body);
+app.post('/campgrounds', validateCampground, catchAsync(async (req, res) => {
     
-    if(error){
-        const msg  = error.details.map( e => e.message).join(',')
-        throw new expressError(msg, 400);
-    }
     const campground = new Campground(req.body.campground)
     await campground.save()
     res.redirect(`/campgrounds/${campground.id}`)
@@ -79,7 +76,7 @@ app.get('/campgrounds/:id/edit', catchAsync(async(req, res) => {
 
 }))
 
-app.put('/campgrounds/:id', catchAsync(async (req, res) => {
+app.put('/campgrounds/:id', validateCampground, catchAsync(async (req, res) => {
     const id = req.params.id;
     const campground = await Campground.findByIdAndUpdate(id, { ...req.body.campground});
     res.redirect(`/campgrounds/${campground._id}`);
