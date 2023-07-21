@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import Review from "./review";
 const Schema = mongoose.Schema;
 
 const CampgroundScheme = new Schema({
@@ -7,7 +8,24 @@ const CampgroundScheme = new Schema({
     price : Number,
     description : String,
     location : String,
+    reviews:[
+        {
+            type: Schema.Types.ObjectId,
+            ref: "Review"
+        }
+    ]
 });
+
+CampgroundScheme.post('findOneAndDelete', async function (doc){
+    if(doc){
+        await Review.remove({
+            _id : {
+                $in: doc.reviews
+            }
+        })
+    }
+})
+
 
 export const Campground = mongoose.model('Campground', CampgroundScheme);
 export default Campground
