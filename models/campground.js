@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import Review from "./review";
+import { Review } from "./review.js";
 const Schema = mongoose.Schema;
 
 const CampgroundScheme = new Schema({
