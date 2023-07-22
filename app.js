@@ -13,6 +13,8 @@ import { campgroundScheme, reviewSchema } from "./schemasVerification.js";
 import  Review from "./models/review.js"
 import reviews from "./routes/reviews.js";
 import campground from "./routes/campground.js";
+import flash from "connect-flash";
+import session from "express-session";
 dotenv.config();
 
 
@@ -30,11 +32,31 @@ const app = express();
 
 app.set('view engine', 'ejs');
 app.engine('ejs', ejsMate)
-app.set('views', path.join(__dirname, 'views'));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(methodOverride('_method'))
 
+app.set('views', path.join(__dirname, 'views'));
+app.use(express.static(path.join(__dirname, 'public')))
+
+const sessionConfig = {
+    secret: process.env.secret_CODE,
+    resave: false,
+    saveUninitialized: true,
+    cookie: {
+        httpOnly: true,
+        expires: Date.now() + 1000 * 60 * 60 * 24 * 7,
+        maxAge: 1000 * 60 * 60 * 24 * 7
+    }
+}
+app.use(session(sessionConfig))
+app.use(flash());
+
+app.use((req, res, next) => {
+    res.locals.success = req.flash("success");
+    res.locals.error = req.flash("error");
+    next();
+})
 
 app.use("/campgrounds", campground)
 app.use("/campgrounds/:id/reviews", reviews)
