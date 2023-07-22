@@ -10,11 +10,16 @@ import catchAsync from "./utils/catchAsync.js";
 import expressError from "./utils/expressError.js";
 import Joi from "joi";
 import { campgroundScheme, reviewSchema } from "./schemasVerification.js";
+import flash from "connect-flash";
+import session from "express-session";
+import passport from "passport";
+import localPassport from 'passport-local';
+import user from "./models/user.js";
 import  Review from "./models/review.js"
 import reviews from "./routes/reviews.js";
 import campground from "./routes/campground.js";
-import flash from "connect-flash";
-import session from "express-session";
+import users from "./routes/users.js"
+
 dotenv.config();
 
 
@@ -52,12 +57,22 @@ const sessionConfig = {
 app.use(session(sessionConfig))
 app.use(flash());
 
+app.use(passport.initialize())
+app.use(passport.session());
+passport.use(new localPassport(user.authenticate()))
+
+passport.serializeUser(user.serializeUser());
+passport.deserializeUser(user.deserializeUser());
+
 app.use((req, res, next) => {
+    res.locals.currentUser = req.user;
     res.locals.success = req.flash("success");
     res.locals.error = req.flash("error");
     next();
 })
 
+
+app.use("/", users)
 app.use("/campgrounds", campground)
 app.use("/campgrounds/:id/reviews", reviews)
 

@@ -3,6 +3,7 @@ import catchAsync from "../utils/catchAsync.js";
 import expressError from "../utils/expressError.js";
 import Campground from "../models/campground.js";
 import { campgroundScheme } from "../schemasVerification.js";
+import { isLoggedIn } from "../middleware.js";
 const router = Router();
 
 
@@ -23,18 +24,19 @@ router.get('/', catchAsync(async (req, res) =>{
     res.render("./campgrounds/index", { campgrounds })
 }))
 
-router.get('/new', (req, res) =>{
+router.get('/new', isLoggedIn, (req, res) =>{
+    
     res.render("./campgrounds/new")
 })
 
-router.post('/', validateCampground, catchAsync(async (req, res) => {
+router.post('/', isLoggedIn, validateCampground, catchAsync(async (req, res) => {
     const campground = new Campground(req.body.campground)
     await campground.save()
     req.flash("success", "Successfully made a new campground!!")
     res.redirect(`/campgrounds/${campground.id}`)
 }))
 
-router.get('/:id', catchAsync(async (req, res) =>{
+router.get('/:id', isLoggedIn, catchAsync(async (req, res) =>{
     const id = req.params.id
     const campground = await Campground.findById(id).populate('reviews');
     if(!campground){
@@ -48,6 +50,10 @@ router.get('/:id', catchAsync(async (req, res) =>{
 router.get('/:id/edit', catchAsync(async(req, res) => {
         const id = req.params.id
         const campground = await Campground.findById(id);
+        if(!campground){
+            req.flash('error', "Cannot find the campground!!")
+            return res.redirect('/campgrounds');
+        }
         res.render('./campgrounds/edits', { campground });
 
 }))
