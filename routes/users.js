@@ -32,7 +32,7 @@ router.get('/login', (req, res) => {
 })
 
 router.post('/login', storeReturnTo, passport.authenticate('local', {failureFlash: true, failureRedirect: '/login'}), catchAsync(async (req, res) => { 
-    const redirectUrl = req.session.returnTo || '/campgrounds';
+    const redirectUrl = res.locals.returnTo || '/campgrounds';
     req.flash('success', 'Welcome Back!!')
     res.redirect(redirectUrl)
 }))
