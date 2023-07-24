@@ -20,8 +20,9 @@ import reviews from "./routes/reviews.js";
 import campground from "./routes/campground.js";
 import users from "./routes/users.js"
 
+if(process.env.NODE_ENV !== "production"){
 dotenv.config();
-
+}
 
 mongoose.connect(process.env.MONGO_PROD_URI)
 

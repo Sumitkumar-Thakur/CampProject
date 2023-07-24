@@ -43,6 +43,7 @@ export const validateCampground = (req, res, next) => {
     const { error } = campgroundScheme.validate(req.body);
     
     if(error){
+        console.log(error)
         const msg  = error.details.map( e => e.message).join(',')
         throw new expressError(msg, 400);
     }
