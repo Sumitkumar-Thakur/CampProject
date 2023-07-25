@@ -4,7 +4,6 @@ import bodyParser from 'body-parser';
 import { Campground }  from './models/campground.js';
 import mongoose from "mongoose";
 import  methodOverride from "method-override";
-import dotenv from 'dotenv';
 import ejsMate from "ejs-mate";
 import catchAsync from "./utils/catchAsync.js";
 import expressError from "./utils/expressError.js";
@@ -18,13 +17,11 @@ import user from "./models/user.js";
 import  Review from "./models/review.js"
 import reviews from "./routes/reviews.js";
 import campground from "./routes/campground.js";
-import users from "./routes/users.js"
+import users from "./routes/users.js";
+import CONSTANTS from "./config/contants.js";
+const { mongoProdUri, secretCode } = CONSTANTS;
 
-if(process.env.NODE_ENV !== "production"){
-dotenv.config();
-}
-
-mongoose.connect(process.env.MONGO_PROD_URI)
+mongoose.connect(mongoProdUri)
 
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error: '));
@@ -43,10 +40,10 @@ app.use(bodyParser.json());
 app.use(methodOverride('_method'))
 
 app.set('views', path.join(__dirname, 'views'));
-app.use(express.static(path.join(__dirname, 'public')))
+app.use(express.static(path.join(__dirname, 'public')));
 
 const sessionConfig = {
-    secret: process.env.secret_CODE,
+    secret: secretCode,
     resave: false,
     saveUninitialized: true,
     cookie: {
@@ -73,6 +70,7 @@ app.use((req, res, next) => {
 })
 
 
+
 app.use("/", users)
 app.use("/campgrounds", campground)
 app.use("/campgrounds/:id/reviews", reviews)
@@ -91,6 +89,7 @@ app.all('*', (req, res, next) => {
 app.use((err, req, res, next) => {
     const { statusCode = 500} = err;
     if(!err.message) err.message = "Oh No, Something Went Wrong";
+    console.log(err)
     res.status(statusCode).render("error", {err});
 })
 

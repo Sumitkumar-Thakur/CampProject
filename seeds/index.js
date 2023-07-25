@@ -26,11 +26,21 @@ const seedDb = async() => {
         const camp = new Campground({
             author: '64bc2f2b6737d87d0940a135',
             location: `${cities[random1000].city}, ${cities[random1000].state}`,
-            image: 'https://source.unsplash.com/collection/483251/1600x900',
+            images: [
+                {
+                    url : 'https://res.cloudinary.com/dlxdgvmki/image/upload/v1690228808/samples/landscapes/nature-mountains.jpg',
+                    filename: 'nature-mountains',
+                },
+                {
+                    url : 'https://res.cloudinary.com/dlxdgvmki/image/upload/v1690228823/cld-sample-2.jpg',
+                    filename: 'cld-sample-2',
+                }
+            ],
             title: `${sample(descriptors)} ${sample(places)}`,
             description: "Lorem ipsum, dolor sit amet consectetur adipisicing elit. Fugit ratione tempore esse quod libero inventore aliquid dolores illo, odio veritatis quisquam architecto quos nesciunt illum blanditiis mollitia distinctio alias quia? Adipisci dolores alias libero laborum at officia temporibus numquam. Libero ut accusantium magni vel perspiciatis rerum. Perferendis, debitis. Molestiae aspernatur rerum facere qui quibusdam accusantium sint minus consequatur voluptates adipisci! Voluptates dicta sunt possimus rem harum impedit voluptas perspiciatis odio modi ex magnam perferendis, sapiente repellat illo tenetur cum accusamus omnis? Commodi rem dolores eum, quam necessitatibus ea numquam dolor.",
             price
         })
+        console.log(camp);
         await camp.save();
     }
 }

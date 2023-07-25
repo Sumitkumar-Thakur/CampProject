@@ -9,10 +9,9 @@ import {storage} from '../cloudinary/index.js'
 const upload = multer({storage});
 const router = Router();
 
-
 router.route('/')
     .get( catchAsync(campgrounds.index))
-    .post( isLoggedIn, validateCampground, upload.array('image'), catchAsync(campgrounds.createCampground))
+    .post( isLoggedIn, upload.array('image'), validateCampground, catchAsync(campgrounds.createCampground))
     
 router.get('/new', isLoggedIn, campgrounds.renderNewForm)
 
