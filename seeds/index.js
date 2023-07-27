@@ -26,6 +26,10 @@ const seedDb = async() => {
         const camp = new Campground({
             author: '64bc2f2b6737d87d0940a135',
             location: `${cities[random1000].city}, ${cities[random1000].state}`,
+            geometry: {
+                type : "Point", 
+                coordinates : [-113.1331, 47.0202]
+            },
             images: [
                 {
                     url : 'https://res.cloudinary.com/dlxdgvmki/image/upload/v1690228808/samples/landscapes/nature-mountains.jpg',

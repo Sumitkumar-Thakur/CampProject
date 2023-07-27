@@ -26,7 +26,6 @@ export const createCampground = async (req, res) => {
     campground.images = req.files.map(f => ({url: f.path, filename: f.filename}));
     campground.author = req.user._id;
     await campground.save()
-    console.log(campground)
     req.flash("success", "Successfully made a new campground!!")
     res.redirect(`/campgrounds/${campground.id}`)
 }
@@ -42,7 +41,7 @@ export const showCampground = async (req, res) =>{
         req.flash('error', "Cannot find the campground!!")
         return res.redirect('/campgrounds');
     }
-    res.render('./campgrounds/show', { campground});
+    res.render('./campgrounds/show', { campground, mapboxToken});
     
 }
 
