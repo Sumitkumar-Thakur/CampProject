@@ -11,5 +11,6 @@ export default {
         cloudName: process.env.CLOUDINARY_CLOUD_NAME,
         key: process.env.CLOUDINARY_KEY,
         secret: process.env.CLOUDINARY_SECRET,
-    }
+    },
+    mapboxToken: process.env.MAPBOX_TOKEN,
 };

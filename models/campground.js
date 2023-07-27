@@ -2,12 +2,29 @@ import mongoose from "mongoose";
 import { Review } from "./review.js";
 const Schema = mongoose.Schema;
 
+const ImageSchema = new Schema({
+    url: String,
+    filename: String,
+})
+
+ImageSchema.virtual('thumbnail').get(function (){
+    return this.url.replace('/upload', '/upload/w_200');
+})
+
 const CampgroundScheme = new Schema({
     title : String,
-    images : [{
-        url: String,
-        filename: String,
-    }],
+    images : [ImageSchema],
+    geometry: {
+        type: {
+            type: String,
+            enum: ['Point'],
+            required: true
+        },
+        coordinates: {
+            type: [Number],
+            required: true
+        }
+    },
     price : Number,
     description : String,
     location : String,
