@@ -19,6 +19,7 @@ import reviews from "./routes/reviews.js";
 import campground from "./routes/campground.js";
 import users from "./routes/users.js";
 import CONSTANTS from "./config/contants.js";
+import ExpressMongoSanitize from "express-mongo-sanitize";
 const { mongoProdUri, secretCode } = CONSTANTS;
 
 mongoose.connect(mongoProdUri)
@@ -56,6 +57,9 @@ app.use(session(sessionConfig))
 app.use(flash());
 
 app.use(passport.initialize())
+app.use(ExpressMongoSanitize({
+    replaceWith: '_'
+}))
 app.use(passport.session());
 passport.use(new localPassport(user.authenticate()))
 
