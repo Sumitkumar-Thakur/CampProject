@@ -20,33 +20,36 @@ const sample = (array) => array[Math.floor(Math.random() * array.length)]
 
 const seedDb = async() => {
     await Campground.deleteMany({});
-    for(let i = 0; i < 50; i++){
+    for(let i = 0; i < 10; i++){
         const random1000 = Math.floor(Math.random() * 1000)
-        const price = Math.floor(Math.random() * 12000)
-        const camp = new Campground({
-            author: '64bc2f2b6737d87d0940a135',
-            location: `${cities[random1000].city}, ${cities[random1000].state}`,
-            geometry: {
-                type : "Point", 
-                coordinates : [-113.1331, 47.0202]
-            },
-            images: [
-                {
-                    url : 'https://res.cloudinary.com/dlxdgvmki/image/upload/v1690228808/samples/landscapes/nature-mountains.jpg',
-                    filename: 'nature-mountains',
-                },
-                {
-                    url : 'https://res.cloudinary.com/dlxdgvmki/image/upload/v1690228823/cld-sample-2.jpg',
-                    filename: 'cld-sample-2',
-                }
-            ],
-            title: `${sample(descriptors)} ${sample(places)}`,
-            description: "Lorem ipsum, dolor sit amet consectetur adipisicing elit. Fugit ratione tempore esse quod libero inventore aliquid dolores illo, odio veritatis quisquam architecto quos nesciunt illum blanditiis mollitia distinctio alias quia? Adipisci dolores alias libero laborum at officia temporibus numquam. Libero ut accusantium magni vel perspiciatis rerum. Perferendis, debitis. Molestiae aspernatur rerum facere qui quibusdam accusantium sint minus consequatur voluptates adipisci! Voluptates dicta sunt possimus rem harum impedit voluptas perspiciatis odio modi ex magnam perferendis, sapiente repellat illo tenetur cum accusamus omnis? Commodi rem dolores eum, quam necessitatibus ea numquam dolor.",
-            price
-        })
-        console.log(camp);
-        await camp.save();
-    }
+        const price = Math.floor(Math.random() * 20) + 10;
+        
+    const camp = new Campground({
+    author: '64bc2f2b6737d87d0940a135',
+    location: `${cities[random1000].city}, ${cities[random1000].state}`,
+    title: `${sample(descriptors)} ${sample(places)}`,
+    description: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Quibusdam dolores vero perferendis laudantium, consequuntur voluptatibus nulla architecto, sit soluta esse iure sed labore ipsam a cum nihil atque molestiae deserunt!',
+    price: price,
+    geometry: {
+        type: "Point",
+        coordinates: [
+            cities[random1000].longitude,
+            cities[random1000].latitude,
+        ]
+    },
+    images: [
+        {
+            url : 'https://res.cloudinary.com/dlxdgvmki/image/upload/v1690228808/samples/landscapes/nature-mountains.jpg',
+            filename: 'nature-mountains'
+        },
+        {
+            url : 'https://res.cloudinary.com/dlxdgvmki/image/upload/v1690228823/cld-sample-2.jpg',
+            filename: 'cld-sample-2'
+        }
+    ]
+})
+await camp.save();
+}
 }
 
 seedDb().then(() => {

@@ -8,7 +8,7 @@ const geocoder = mbxGeocoding({accessToken: mapboxToken})
 
 export const index = async (req, res) =>{
     const campgrounds = await Campground.find({});
-    res.render("./campgrounds/index", { campgrounds })
+    res.render("./campgrounds/index", { campgrounds, mapboxToken})
 }
 
 export const renderNewForm = (req, res) =>{
@@ -79,7 +79,7 @@ export const deleteCampground = async (req, res) => {
     const campground = await Campground.findById(id);
     await Campground.findByIdAndRemove(id, { ...req.body.campground});
     req.flash("success", "Successfully deleted a campground!!")
-    res.redirect(`/campgrounds`);
+    res.redirect(`/campgrounds`, { mapboxToken});
 }
 
 export default {
