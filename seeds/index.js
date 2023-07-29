@@ -5,7 +5,7 @@ import cities from './cities.js';
 import { places, descriptors } from './seedHelpers.js';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
-
+import review from '../models/review.js';
 dotenv.config();
 
 mongoose.connect(process.env.MONGO_PROD_URI)
@@ -20,6 +20,7 @@ const sample = (array) => array[Math.floor(Math.random() * array.length)]
 
 const seedDb = async() => {
     await Campground.deleteMany({});
+    await review.deleteMany({});
     for(let i = 0; i < 10; i++){
         const random1000 = Math.floor(Math.random() * 1000)
         const price = Math.floor(Math.random() * 20) + 10;

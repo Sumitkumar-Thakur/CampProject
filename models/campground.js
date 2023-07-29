@@ -54,7 +54,12 @@ CampgroundScheme.post('findOneAndDelete', async function (doc){
             _id : {
                 $in: doc.reviews
             }
-        })
+        });
+        if(doc.images.length > 0){
+            for (let img of doc.images) {
+                await cloudinary.uploader.destroy(img.filename);
+            }
+        }
     }
 })
 
